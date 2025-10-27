@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import type { Answer } from "../entities/answer.js";
+import type { Answer } from "../../enterprise/entities/answer.js";
 import type { AnswersRepository } from "../repositories/answers-repository.js";
 import { AnswerQuestionUseCase } from "./answer-question.js";
 
