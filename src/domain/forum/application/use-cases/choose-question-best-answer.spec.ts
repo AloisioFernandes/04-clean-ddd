@@ -4,6 +4,7 @@ import { makeQuestion } from "test/factories/make-question.js";
 import { InMemoryAnswersRepository } from "test/repositories/in-memory-answers-repository.js";
 import { InMemoryQuestionsRepository } from "test/repositories/in-memory-questions-repository.js";
 import { ChooseQuestionBestAnswerUseCase } from "./choose-question-best-answer.js";
+import { NotAllowedError } from "./errors/not-allowed-error.js";
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
@@ -21,10 +22,10 @@ describe("Choose Question Best Answer", () => {
   });
 
   it("should be able to choose the question best answer", async () => {
-    const question = makeQuestion()
+    const question = makeQuestion();
     const answer = makeAnswer({
       questionId: question.id,
-    })
+    });
 
     await inMemoryQuestionsRepository.create(question);
     await inMemoryAnswersRepository.create(answer);
@@ -34,25 +35,28 @@ describe("Choose Question Best Answer", () => {
       answerId: answer.id.toString(),
     });
 
-    expect(inMemoryQuestionsRepository.items[0]?.bestAnswerId).toEqual(answer.id);
+    expect(inMemoryQuestionsRepository.items[0]?.bestAnswerId).toEqual(
+      answer.id
+    );
   });
 
   it("should not be able to choose another user question best answer", async () => {
     const question = makeQuestion({
       authorId: new UniqueEntityID("author-1"),
-    })
+    });
     const answer = makeAnswer({
       questionId: question.id,
-    })
+    });
 
     await inMemoryQuestionsRepository.create(question);
     await inMemoryAnswersRepository.create(answer);
 
-    expect(() => {
-      return sut.execute({
-        authorId: answer.id.toString(),
-        answerId: "answer-1",
-      });
-    }).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      authorId: "author-2",
+      answerId: answer.id.toString(),
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 });
