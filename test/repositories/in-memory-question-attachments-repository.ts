@@ -1,5 +1,5 @@
-import type { QuestionAttachment } from "../../enterprise/entities/question-attachment.js";
-import type { QuestionAttachmentsRepository } from "./question-attachments-repository.js";
+import type { QuestionAttachmentsRepository } from "../../src/domain/forum/application/repositories/question-attachments-repository.js";
+import type { QuestionAttachment } from "../../src/domain/forum/enterprise/entities/question-attachment.js";
 
 export class InMemoryQuestionAttachmentsRepository
   implements QuestionAttachmentsRepository
